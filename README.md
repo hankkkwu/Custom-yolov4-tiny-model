@@ -21,6 +21,7 @@ For training a custom yolov4-tiny model, we'll use the [darknet](https://github.
 * (Optional) Do data augmentation using [Roboflow](https://app.roboflow.ai)
 
 * Create file `train.txt` with filenames of your images, each filename in new line, for example containing:
+(you can use the `list_jpg_file_paths_in_a_txt()` function in [helper_functions.py](https://github.com/hankkkwu/Custom-yolov4-tiny-model/blob/main/helper_functions.py) to get the job done)
 ```
 data/obj/img1.jpg
 data/obj/img2.jpg
@@ -71,6 +72,8 @@ Gathering a dataset from Google's Open Images Dataset and using OIDv4 toolkit to
 
 * Edit the `/OIDv4_ToolKit/classes.txt` with objects names. (each in new line)
 
+* Before generate `.txt` file for each image, if you have "two words" class, eg. Traffic light, Stop sign, etc. You might want to add a underscore between two words in each text file in both `OID/Dataset/train/obj/Label/` and `OID/Dataset/validation/test/Label/`. (You can use the `add_a_underscore_between_two_word()` function in [helper_functions.py](https://github.com/hankkkwu/Custom-yolov4-tiny-model/blob/main/helper_functions.py) to get the job done.)
+
 * Generate `.txt` file for each image
 
     `python3 convert_annotations.py`
@@ -86,6 +89,7 @@ Gathering a dataset from Google's Open Images Dataset and using OIDv4 toolkit to
 * Compress the `obj` and `test` folder into `obj.zip` and `test.zip`
 
 * Create file `train.txt` with filenames of your images, each filename in new line, for example containing:
+(you can use the `list_jpg_file_paths_in_a_txt()` function in [helper_functions.py](https://github.com/hankkkwu/Custom-yolov4-tiny-model/blob/main/helper_functions.py) to get the job done)
 ```
 data/obj/img1.jpg
 data/obj/img2.jpg
