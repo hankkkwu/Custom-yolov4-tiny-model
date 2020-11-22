@@ -1,10 +1,11 @@
 # Train a custom yolov4-tiny model and convert the .weight file to .tflite file
 
+Here is the link to [Colab](https://colab.research.google.com/drive/1gMpQaLjLPomF0yklDnJcqb-3wygJfhiS?usp=sharing)
 
 ## Training the custom yolov4-tiny model:
 For training a custom yolov4-tiny model, we'll use the [darknet](https://github.com/AlexeyAB/darknet) repository.
 
-### Step1: Prepare the custom dataset:
+### Step1: Prepare the custom dataset
 #### Method1: Manually collect data and label it
 * Collect images and split into `obj` file and `test` file 
 * Using [labelImg](https://github.com/tzutalin/labelImg) to label the images. It will create .txt-file for each .jpg-file in the same directory and with the same name.
@@ -52,15 +53,37 @@ Gathering a dataset from Google's Open Images Dataset and using OIDv4 toolkit to
 
     `pip install -r requirements.txt`
 
-* Download the data from Open Images Dataset
+* Download the data from Open Images Dataset for training dataset (in this case, I downloaded the following 7 classes: Motorcycle, Bicycle, Car, Bus, Person, Stop_sign, Traffic_light)
 
     `python3 main.py downloader --classes Motorcycle Bicycle Car Bus Person Stop_sign Traffic_light --type_csv train --limit 500 --multiclasses 1`
+
+* Rename the training dataset folder to train
+
+    `mv OID/Dataset/validation/Motorcycle_Bicycle_Car_Bus_Person_Stop\ sign_Traffic\ light/ OID/Dataset/train/train`
+
+* Download the data from Open Images Dataset for validation dataset
+
+    `python3 main.py downloader --classes Motorcycle Bicycle Car Bus Person Stop_sign Traffic_light --type_csv validation --limit 100 --multiclasses 1`
+
+* Rename the validation dataset folder to test
+
+    `mv OID/Dataset/validation/Motorcycle_Bicycle_Car_Bus_Person_Stop\ sign_Traffic\ light/ OID/Dataset/validation/test`
 
 * Edit the `/OIDv4_ToolKit/classes.txt` with objects names. (each in new line)
 
 * Generate `.txt` file for each image
 
     `python3 convert_annotations.py`
+
+* Delete the old labels for training
+
+    `rm -r OID/Dataset/train/obj/Label/`
+
+* Delete the old labels for validation
+
+    `rm -r OID/Dataset/validation/test/Label/`
+
+* Compress the `obj` and `test` folder into `obj.zip` and `test.zip`
 
 * Create file `train.txt` with filenames of your images, each filename in new line, for example containing:
 ```
@@ -125,8 +148,13 @@ i) cfg file:
 * change line `classes=80` to your number of objects in each of 2 [yolo]-layers
 * change [filters=255] to `filters=(classes + 5)x3` in the 2 [convolutional] before each [yolo] layer. (keep in mind that it only has to be the last [convolutional] before each of the [yolo] layers.)
 
+* Copy the custom config file to cfg folder
+    `!cp ../mydrive/My\ Drive/yolov4/yolov4-tiny-obj.cfg ./cfg`
+
 ii) obj.names:
 * Create file `obj.names` with objects names. (each in new line)
+* Copy the `obj.names` file to data folder
+    `!cp ../mydrive/My\ Drive/yolov4/obj.names ./data`
 
 iii) obj.data:
 * Create file `obj.data` containing (where classes = number of objects):
@@ -137,6 +165,8 @@ valid  = data/test.txt
 names = data/obj.names
 backup = /mydrive/My\ Drive/yolov4/backup    # (Create a backup folder in your google drive and put its correct path in this file.)
 ```
+* Copy the `obj.data` file to data folder
+    `!cp ../mydrive/My\ Drive/yolov4/obj.data ./data`
 
 
 #### Upload our custom dataset for YOLOv4-tiny
@@ -216,7 +246,7 @@ imShow('chart.png')
 
 
 
-#### Step3: Checking the Mean Average Precision (mAP) of Your Model
+### Step3: Checking the Mean Average Precision (mAP) of Your Model
 Run the following command on any of the saved weights from the training to see the mAP value for that specific weight's file. I would suggest to run it on multiple of the saved weights to compare and find the weights with the highest mAP as that is the most accurate one!
 
 NOTE: If you think your final weights file has overfitted then it is important to run these mAP commands to see if one of the previously saved weights is a more accurate model for your classes.
@@ -224,7 +254,7 @@ NOTE: If you think your final weights file has overfitted then it is important t
     `!./darknet detector map data/obj.data cfg/yolov4-tiny-obj.cfg /content/darknet/backup/yolov4-tiny-obj_best.weights`
 
 
-#### Step4: Run Your Custom Object Detector!!!
+### Step4: Run Your Custom Object Detector!!!
 * need to set our custom cfg to test mode
 ``` 
 %cd cfg
@@ -235,7 +265,7 @@ NOTE: If you think your final weights file has overfitted then it is important t
 
 * run your custom detector with this command (upload an image to your google drive to test, thresh flag sets accuracy that detection must be in order to show it)
 ```
-!./darknet detector test data/obj.data cfg/yolov4-tiny-obj.cfg /content/darknet/backup/yolov4-tiny-obj_final.weights ../mydrive/My\ Drive/yolov4/3.jpg -thresh 0.3
+!./darknet detector test data/obj.data cfg/yolov4-tiny-obj.cfg /content/darknet/backup/yolov4-tiny-obj_best.weights ../mydrive/My\ Drive/yolov4/3.jpg -thresh 0.3
 imShow('predictions.jpg')
 ```
 
@@ -256,7 +286,7 @@ For converting the .weight file to .tflite file, using this [respository](https:
 ### Step2: Configure
 * Change the labels from the default COCO to our own custom ones
 ```
-!cp /content/drive/MyDrive/yolov4/obj.names /content/tensorflow-yolov4-tflite/data/classes/
+!cp /content/mydrive/My\ Drive/yolov4/obj.names /content/tensorflow-yolov4-tflite/data/classes/
 !ls /content/tensorflow-yolov4-tflite/data/classes/
 !sed -i "s/coco.names/obj.names/g" /content/tensorflow-yolov4-tflite/core/config.py
 ```
@@ -264,7 +294,7 @@ For converting the .weight file to .tflite file, using this [respository](https:
 ### Step3: Upload the .weights file
 * Upload the custom .weight file for converting
 ```
-!cp /content/drive/MyDrive/yolov4/yolov4-tiny-obj_best.weights /content/darknet/backup/
+!cp /content/dmydrive/My\ Drive/yolov4/yolov4-tiny-obj_best.weights /content/darknet/backup/
 !ls /content/darknet/backup/
 ```
 
@@ -290,6 +320,6 @@ For converting the .weight file to .tflite file, using this [respository](https:
 ### Step6: Save your Model
 * You can save your model to your Google Drive for further use.
 ```
-!cp -r /content/tensorflow-yolov4-tflite/checkpoints/yolov4-tiny-416/ "/content/drive/My Drive/yolov4"
-!cp /content/tensorflow-yolov4-tflite/checkpoints/yolov4-tiny-416.tflite "/content/drive/My Drive/yolov4"
+!cp -r /content/tensorflow-yolov4-tflite/checkpoints/yolov4-tiny-416/ "/content/mydrive/My Drive/yolov4"
+!cp /content/tensorflow-yolov4-tflite/checkpoints/yolov4-tiny-416.tflite "/content/mydrive/My Drive/yolov4"
 ```
