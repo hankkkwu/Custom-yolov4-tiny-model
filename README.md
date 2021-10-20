@@ -146,11 +146,11 @@ i) cfg file:
 * Create file `yolov4-tiny-obj.cfg` with the same content as in `yolov4-tiny-custom.cfg`
 * change line batch to `batch=64`
 * change line subdivisions to `subdivisions=16`
-* change line max_batches to (classes*2000 but not less than number of training images, but not less than number of training images and not less than 6000), i.e. `max_batches=6000` if you train for 3 classes
+* change line max_batches to (classes*2000, but not less than number of training images and not less than 6000), i.e. `max_batches=6000` if you train for 3 classes
 * change line steps to 80% and 90% of max_batches, i.e. `steps=4800,5400`
 * set network size `width=416`, `height=416` or any value multiple of 32
-* change line `classes=80` to your number of objects in each of 2 [yolo]-layers
-* change [filters=255] to `filters=(classes + 5)x3` in the 2 [convolutional] before each [yolo] layer. (keep in mind that it only has to be the last [convolutional] before each of the [yolo] layers.)
+* change line `classes=80` to your number of objects in each of 3 [yolo]-layers
+* change [filters=255] to `filters=(classes + 5)x3` in the 3 [convolutional] before each [yolo] layer. (keep in mind that it only has to be the last [convolutional] before each of the [yolo] layers.)
 
 * Copy the custom config file to cfg folder
     `!cp ../mydrive/My\ Drive/yolov4/yolov4-tiny-obj.cfg ./cfg`
